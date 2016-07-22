@@ -1,0 +1,18 @@
+//
+//  AnyTableView-Prefix.pch
+//  AnyTableView
+//
+//  Created by DoubleHH on 16/7/21.
+//  Copyright © 2016年 com.chiyue. All rights reserved.
+//
+
+#ifndef AnyTableView_Prefix_pch
+#define AnyTableView_Prefix_pch
+
+#import "UIView+Utils.h"
+
+
+#define SCREEN_HEIGHT [UIScreen mainScreen].bounds.size.height
+#define SCREEN_WIDTH [UIScreen mainScreen].bounds.size.width
+
+#endif /* AnyTableView_Prefix_pch */

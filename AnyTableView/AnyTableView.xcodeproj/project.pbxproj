@@ -10,9 +10,12 @@
 		53CC6E141D40F2F2009932AF /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 53CC6E131D40F2F2009932AF /* main.m */; };
 		53CC6E171D40F2F2009932AF /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 53CC6E161D40F2F2009932AF /* AppDelegate.m */; };
 		53CC6E1A1D40F2F2009932AF /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 53CC6E191D40F2F2009932AF /* ViewController.m */; };
-		53CC6E1D1D40F2F2009932AF /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 53CC6E1B1D40F2F2009932AF /* Main.storyboard */; };
 		53CC6E1F1D40F2F2009932AF /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 53CC6E1E1D40F2F2009932AF /* Assets.xcassets */; };
 		53CC6E221D40F2F2009932AF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 53CC6E201D40F2F2009932AF /* LaunchScreen.storyboard */; };
+		53CC6E2C1D40F94D009932AF /* UIView+Utils.m in Sources */ = {isa = PBXBuildFile; fileRef = 53CC6E2B1D40F94D009932AF /* UIView+Utils.m */; };
+		53CC6E331D40FAB0009932AF /* AnyTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 53CC6E321D40FAB0009932AF /* AnyTableView.m */; };
+		53CC6E361D40FBFA009932AF /* AnyTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 53CC6E351D40FBFA009932AF /* AnyTableViewCell.m */; };
+		53CC6E391D410026009932AF /* ImitateTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 53CC6E381D410026009932AF /* ImitateTableView.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -22,10 +25,18 @@
 		53CC6E161D40F2F2009932AF /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		53CC6E181D40F2F2009932AF /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
 		53CC6E191D40F2F2009932AF /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
-		53CC6E1C1D40F2F2009932AF /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		53CC6E1E1D40F2F2009932AF /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		53CC6E211D40F2F2009932AF /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		53CC6E231D40F2F2009932AF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		53CC6E291D40F8C5009932AF /* AnyTableView-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "AnyTableView-Prefix.pch"; sourceTree = "<group>"; };
+		53CC6E2A1D40F94D009932AF /* UIView+Utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIView+Utils.h"; sourceTree = "<group>"; };
+		53CC6E2B1D40F94D009932AF /* UIView+Utils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIView+Utils.m"; sourceTree = "<group>"; };
+		53CC6E311D40FAB0009932AF /* AnyTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AnyTableView.h; sourceTree = "<group>"; };
+		53CC6E321D40FAB0009932AF /* AnyTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AnyTableView.m; sourceTree = "<group>"; };
+		53CC6E341D40FBFA009932AF /* AnyTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AnyTableViewCell.h; sourceTree = "<group>"; };
+		53CC6E351D40FBFA009932AF /* AnyTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AnyTableViewCell.m; sourceTree = "<group>"; };
+		53CC6E371D410026009932AF /* ImitateTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImitateTableView.h; sourceTree = "<group>"; };
+		53CC6E381D410026009932AF /* ImitateTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ImitateTableView.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -58,11 +69,13 @@
 		53CC6E111D40F2F2009932AF /* AnyTableView */ = {
 			isa = PBXGroup;
 			children = (
+				53CC6E301D40FAB0009932AF /* AnyTableView */,
 				53CC6E151D40F2F2009932AF /* AppDelegate.h */,
 				53CC6E161D40F2F2009932AF /* AppDelegate.m */,
 				53CC6E181D40F2F2009932AF /* ViewController.h */,
 				53CC6E191D40F2F2009932AF /* ViewController.m */,
-				53CC6E1B1D40F2F2009932AF /* Main.storyboard */,
+				53CC6E2A1D40F94D009932AF /* UIView+Utils.h */,
+				53CC6E2B1D40F94D009932AF /* UIView+Utils.m */,
 				53CC6E1E1D40F2F2009932AF /* Assets.xcassets */,
 				53CC6E201D40F2F2009932AF /* LaunchScreen.storyboard */,
 				53CC6E231D40F2F2009932AF /* Info.plist */,
@@ -74,9 +87,23 @@
 		53CC6E121D40F2F2009932AF /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				53CC6E291D40F8C5009932AF /* AnyTableView-Prefix.pch */,
 				53CC6E131D40F2F2009932AF /* main.m */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		53CC6E301D40FAB0009932AF /* AnyTableView */ = {
+			isa = PBXGroup;
+			children = (
+				53CC6E311D40FAB0009932AF /* AnyTableView.h */,
+				53CC6E321D40FAB0009932AF /* AnyTableView.m */,
+				53CC6E341D40FBFA009932AF /* AnyTableViewCell.h */,
+				53CC6E351D40FBFA009932AF /* AnyTableViewCell.m */,
+				53CC6E371D410026009932AF /* ImitateTableView.h */,
+				53CC6E381D410026009932AF /* ImitateTableView.m */,
+			);
+			path = AnyTableView;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -138,7 +165,6 @@
 			files = (
 				53CC6E221D40F2F2009932AF /* LaunchScreen.storyboard in Resources */,
 				53CC6E1F1D40F2F2009932AF /* Assets.xcassets in Resources */,
-				53CC6E1D1D40F2F2009932AF /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -150,7 +176,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				53CC6E1A1D40F2F2009932AF /* ViewController.m in Sources */,
+				53CC6E331D40FAB0009932AF /* AnyTableView.m in Sources */,
+				53CC6E361D40FBFA009932AF /* AnyTableViewCell.m in Sources */,
 				53CC6E171D40F2F2009932AF /* AppDelegate.m in Sources */,
+				53CC6E391D410026009932AF /* ImitateTableView.m in Sources */,
+				53CC6E2C1D40F94D009932AF /* UIView+Utils.m in Sources */,
 				53CC6E141D40F2F2009932AF /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -158,14 +188,6 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXVariantGroup section */
-		53CC6E1B1D40F2F2009932AF /* Main.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				53CC6E1C1D40F2F2009932AF /* Base */,
-			);
-			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
 		53CC6E201D40F2F2009932AF /* LaunchScreen.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -263,6 +285,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "AnyTableView/AnyTableView-Prefix.pch";
 				INFOPLIST_FILE = AnyTableView/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.chiyue.AnyTableView;
@@ -274,6 +298,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "AnyTableView/AnyTableView-Prefix.pch";
 				INFOPLIST_FILE = AnyTableView/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.chiyue.AnyTableView;
