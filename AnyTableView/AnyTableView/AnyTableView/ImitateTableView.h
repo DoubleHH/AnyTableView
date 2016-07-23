@@ -13,10 +13,10 @@
 
 @protocol ImitateTableViewDelegate <NSObject>
 
-- (NSInteger)tableView:(ImitateTableView *)tableView numberOfRowsInSection:(NSInteger)section;
-- (NSInteger)numberOfSectionsInTableView:(ImitateTableView *)tableView;
-- (CGFloat)tableView:(ImitateTableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath;
-- (AnyTableViewCell *)tableView:(ImitateTableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath;
+- (NSInteger)imitateTableView:(ImitateTableView *)tableView numberOfRowsInSection:(NSInteger)section;
+- (NSInteger)numberOfSectionsInImitateTableView:(ImitateTableView *)tableView;
+- (CGFloat)imitateTableView:(ImitateTableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath;
+- (AnyTableViewCell *)imitateTableView:(ImitateTableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath;
 
 @end
 

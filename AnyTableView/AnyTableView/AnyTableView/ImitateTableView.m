@@ -8,11 +8,13 @@
 
 #import "ImitateTableView.h"
 
+#define NSLog(...)
+
 static const CGFloat Interval = 0;
 
 @interface ImitateTableView ()
 
-@property (nonatomic, strong) NSMutableArray *reuseCells;
+@property (nonatomic, strong) NSMutableDictionary *reuseCells;
 @property (nonatomic, strong) NSMutableArray *visibleCells;
 
 @end
@@ -23,15 +25,15 @@ static const CGFloat Interval = 0;
 {
     self = [super initWithFrame:frame];
     if (self) {
-        self.reuseCells = [NSMutableArray array];
+        self.reuseCells = [NSMutableDictionary dictionary];
         self.visibleCells = [NSMutableArray array];
         self.alwaysBounceVertical = YES;
     }
     return self;
 }
 
-- (void)willMoveToSuperview:(UIView *)newSuperview {
-    [super willMoveToSuperview:newSuperview];
+- (void)setImitateDelegate:(id<ImitateTableViewDelegate>)imitateDelegate {
+    _imitateDelegate = imitateDelegate;
     [self reloadData];
 }
 
@@ -50,9 +52,11 @@ static const CGFloat Interval = 0;
     }
 }
 
+
 - (void)viewMovedIsUpDirection:(BOOL)isUpDirection {
     CGFloat endY = self.contentOffset.y + self.height;
     // 循环减掉划出去的cell
+    AnyTableViewCell *lastCell = nil;
     while (self.visibleCells.count) {
         BOOL isMovedOut = NO;
         AnyTableViewCell *cell = nil;
@@ -65,13 +69,10 @@ static const CGFloat Interval = 0;
         }
         if (isMovedOut) {
             // 已经划出去了
-            if (![self.reuseCells containsObject:cell]) {
-                if (isUpDirection) {
-                    self.reuseCells[0] = cell;
-                } else {
-                    self.reuseCells[1] = cell;
-                }
+            if (self.visibleCells.count == 1) {
+                lastCell = cell;
             }
+            [self reuseCell:cell];
             [cell removeFromSuperview];
             [self.visibleCells removeObject:cell];
             NSLog(@"%@ moved out!!", cell.indexPath);
@@ -83,74 +84,87 @@ static const CGFloat Interval = 0;
     // 双循环添加需要显示的Cell
     NSLog(@"contentOffset.y : %f", self.contentOffset.y);
     if (isUpDirection) {
-        AnyTableViewCell *lastCell = [self.visibleCells lastObject];
-        if (!lastCell) {
-            if (self.contentOffset.y > -self.height) {
-                lastCell = [self addFirstCell];
+        // 往上走的处理
+        AnyTableViewCell *startCell = [self.visibleCells lastObject] ?: lastCell;
+        if (!startCell) {
+            // 所有的cell被用户暂时滑到屏幕下方
+            if (self.contentOffset.y > -self.height && self.contentOffset.y < 0) { // 此时将要露出来的时候，需要查找第一个cell用于显示
+                startCell = [self addFirstCell];
             }
         }
-        if (lastCell && lastCell.bottom < endY) {
-            float height = lastCell.bottom;
-            NSUInteger sections = [self.imitateDelegate numberOfSectionsInTableView:self];
-            BOOL finished = NO;
-            for (NSUInteger tempSection = lastCell.indexPath.section; tempSection < sections; ++tempSection) {
-                NSUInteger tempRow = tempSection == lastCell.indexPath.section ? (lastCell.indexPath.row + 1) : 0;
-                NSUInteger rows = [self.imitateDelegate tableView:self numberOfRowsInSection:tempSection];
-                for (; tempRow < rows; ++tempRow) {
-                    NSIndexPath *indexPath = [NSIndexPath indexPathForRow:tempRow inSection:tempSection];
-                    CGFloat cellHeight = [self.imitateDelegate tableView:self heightForRowAtIndexPath:indexPath];
+        if (!startCell || startCell.bottom >= endY) {
+            return;
+        }
+        float height = startCell.bottom;
+        NSUInteger sections = [self.imitateDelegate numberOfSectionsInImitateTableView:self];
+        BOOL finished = NO;
+        for (NSUInteger tempSection = startCell.indexPath.section; tempSection < sections; ++tempSection) {
+            NSUInteger tempRow = tempSection == startCell.indexPath.section ? (startCell.indexPath.row + 1) : 0;
+            NSUInteger rows = [self.imitateDelegate imitateTableView:self numberOfRowsInSection:tempSection];
+            for (; tempRow < rows; ++tempRow) {
+                NSIndexPath *indexPath = [NSIndexPath indexPathForRow:tempRow inSection:tempSection];
+                CGFloat cellHeight = [self.imitateDelegate imitateTableView:self heightForRowAtIndexPath:indexPath];
+                
+                if (height + cellHeight >= self.contentOffset.y) { // 异常处理，都划出去了
                     AnyTableViewCell *cell = [self cellWithIndexPath:indexPath];
                     cell.frame = CGRectMake(0, height, self.width, cellHeight);
                     [self addSubview:cell];
                     
                     [self.visibleCells addObject:cell];
-                    
-                    height += cellHeight;
-                    
-                    if (height >= endY) {
-                        finished = YES;
-                        break;
-                    }
                 }
-                if (finished) {
+                
+                height += cellHeight;
+                
+                if (height >= endY) {
+                    finished = YES;
                     break;
                 }
+            }
+            if (finished) {
+                break;
             }
         }
     }
     else {
-        AnyTableViewCell *firstCell = [self.visibleCells firstObject];
-        if (!firstCell) {
-            if (self.contentOffset.y > 0 && self.contentOffset.y < self.contentSize.height) {
-                firstCell = [self addLastCell];
+        // 往下走的处理
+        AnyTableViewCell *startCell = [self.visibleCells firstObject] ?: lastCell;
+        if (!startCell) {
+            // 所有的cell被用户暂时滑到屏幕上方
+            if (self.contentOffset.y > 0 &&
+                self.contentOffset.y < self.contentSize.height) { // 此时将要露出来的时候，需要查找最后的cell用于显示
+                startCell = [self addLastCell];
             }
         }
-        if (firstCell && firstCell.top > self.contentOffset.y) {
-            float height = firstCell.top;
-            NSUInteger sections = [self.imitateDelegate numberOfSectionsInTableView:self];
-            BOOL finished = NO;
-            for (NSUInteger tempSection = firstCell.indexPath.section; tempSection < sections; --tempSection) {
-                NSUInteger rows = [self.imitateDelegate tableView:self numberOfRowsInSection:tempSection];
-                NSUInteger tempRow = tempSection == firstCell.indexPath.section ? (firstCell.indexPath.row - 1) : rows - 1;
-                for (; tempRow < rows; --tempRow) {
-                    NSIndexPath *indexPath = [NSIndexPath indexPathForRow:tempRow inSection:tempSection];
-                    CGFloat cellHeight = [self.imitateDelegate tableView:self heightForRowAtIndexPath:indexPath];
+        if (!startCell || startCell.top <= self.contentOffset.y) {
+            return;
+        }
+        float height = startCell.top;
+        NSUInteger sections = [self.imitateDelegate numberOfSectionsInImitateTableView:self];
+        BOOL finished = NO;
+        for (NSUInteger tempSection = startCell.indexPath.section; tempSection < sections; --tempSection) {
+            NSUInteger rows = [self.imitateDelegate imitateTableView:self numberOfRowsInSection:tempSection];
+            NSUInteger tempRow = tempSection == startCell.indexPath.section ? (startCell.indexPath.row - 1) : rows - 1;
+            for (; tempRow < rows; --tempRow) {
+                NSIndexPath *indexPath = [NSIndexPath indexPathForRow:tempRow inSection:tempSection];
+                CGFloat cellHeight = [self.imitateDelegate imitateTableView:self heightForRowAtIndexPath:indexPath];
+                
+                if (height - cellHeight <= endY) {
                     AnyTableViewCell *cell = [self cellWithIndexPath:indexPath];
                     cell.frame = CGRectMake(0, height - cellHeight, self.width, cellHeight);
                     [self addSubview:cell];
                     
                     [self.visibleCells insertObject:cell atIndex:0];
-                    
-                    height -= cellHeight;
-                    
-                    if (height <= self.contentOffset.y) {
-                        finished = YES;
-                        break;
-                    }
                 }
-                if (finished) {
+                
+                height -= cellHeight;
+                
+                if (height <= self.contentOffset.y) {
+                    finished = YES;
                     break;
                 }
+            }
+            if (finished) {
+                break;
             }
         }
     }
@@ -158,12 +172,12 @@ static const CGFloat Interval = 0;
 
 - (AnyTableViewCell *)addLastCell {
     AnyTableViewCell *cell = nil;
-    NSUInteger sections = [self.imitateDelegate numberOfSectionsInTableView:self];
+    NSUInteger sections = [self.imitateDelegate numberOfSectionsInImitateTableView:self];
     for (NSUInteger tempSection = sections - 1; tempSection < sections; --tempSection) {
-        NSUInteger rows = [self.imitateDelegate tableView:self numberOfRowsInSection:tempSection];
+        NSUInteger rows = [self.imitateDelegate imitateTableView:self numberOfRowsInSection:tempSection];
         if (rows) {
             cell = [self cellWithIndexPath:[NSIndexPath indexPathForRow:rows-1 inSection:tempSection]];
-            CGFloat cellHeight = [self.imitateDelegate tableView:self heightForRowAtIndexPath:cell.indexPath];
+            CGFloat cellHeight = [self.imitateDelegate imitateTableView:self heightForRowAtIndexPath:cell.indexPath];
             cell.frame = CGRectMake(0, self.contentSize.height - cellHeight, self.width, cellHeight);
             if (![self.visibleCells containsObject:cell]) {
                 [self addSubview:cell];
@@ -178,12 +192,12 @@ static const CGFloat Interval = 0;
 
 - (AnyTableViewCell *)addFirstCell {
     AnyTableViewCell *cell = nil;
-    NSUInteger sections = [self.imitateDelegate numberOfSectionsInTableView:self];
+    NSUInteger sections = [self.imitateDelegate numberOfSectionsInImitateTableView:self];
     for (NSUInteger tempSection = 0; tempSection < sections; ++tempSection) {
-        NSUInteger rows = [self.imitateDelegate tableView:self numberOfRowsInSection:tempSection];
+        NSUInteger rows = [self.imitateDelegate imitateTableView:self numberOfRowsInSection:tempSection];
         if (rows) {
             cell = [self cellWithIndexPath:[NSIndexPath indexPathForRow:0 inSection:tempSection]];
-            CGFloat cellHeight = [self.imitateDelegate tableView:self heightForRowAtIndexPath:cell.indexPath];
+            CGFloat cellHeight = [self.imitateDelegate imitateTableView:self heightForRowAtIndexPath:cell.indexPath];
             cell.frame = CGRectMake(0, 0, self.width, cellHeight);
             if (![self.visibleCells containsObject:cell]) {
                 [self addSubview:cell];
@@ -197,22 +211,22 @@ static const CGFloat Interval = 0;
 }
 
 - (AnyTableViewCell *)cellWithIndexPath:(NSIndexPath *)indexPath {
-    AnyTableViewCell *cell = [self.imitateDelegate tableView:self cellForRowAtIndexPath:indexPath];
+    AnyTableViewCell *cell = [self.imitateDelegate imitateTableView:self cellForRowAtIndexPath:indexPath];
     cell.indexPath = indexPath;
     return cell;
 }
 
 - (void)reloadData {
-    NSUInteger sections = [self.imitateDelegate numberOfSectionsInTableView:self];
+    NSUInteger sections = [self.imitateDelegate numberOfSectionsInImitateTableView:self];
     CGPoint visibleLine = CGPointMake(self.contentOffset.y, self.contentOffset.y + self.height);
     CGFloat height = 0;
     [self.visibleCells removeAllObjects];
     for (int tempSection = 0; tempSection < sections; ++tempSection) {
-        NSUInteger rows = [self.imitateDelegate tableView:self numberOfRowsInSection:tempSection];
+        NSUInteger rows = [self.imitateDelegate imitateTableView:self numberOfRowsInSection:tempSection];
         for (int tempRow = 0; tempRow < rows; ++tempRow) {
             NSIndexPath *indexPath = [NSIndexPath indexPathForRow:tempRow inSection:tempSection];
             CGFloat preHeight = height;
-            CGFloat cellHeight = [self.imitateDelegate tableView:self heightForRowAtIndexPath:indexPath];
+            CGFloat cellHeight = [self.imitateDelegate imitateTableView:self heightForRowAtIndexPath:indexPath];
             height += cellHeight;
             if ([self isIntersectWithLine:CGPointMake(preHeight, height) otherLine:visibleLine]) {
                 AnyTableViewCell *cell = [self cellWithIndexPath:indexPath];
@@ -225,22 +239,54 @@ static const CGFloat Interval = 0;
     self.contentSize = CGSizeMake(self.width, height);
 }
 
+//! 两线段是否相交
+- (BOOL)isIntersectWithLine:(CGPoint)line otherLine:(CGPoint)otherLine {
+    return
+    ((line.x - otherLine.x) >= Interval && (otherLine.y - line.x) >= Interval) ||
+    ((line.y - otherLine.x) >= Interval && (otherLine.y - line.y) >= Interval) ||
+    ((line.x - otherLine.x) < Interval && (line.y - otherLine.y) > Interval);
+}
+
+#pragma mark - 缓存机制
+/**
+ *  缓存cell
+ *
+ *  @param cell AnyTableViewCell
+ */
+- (void)reuseCell:(AnyTableViewCell *)cell {
+    if (!cell.reuseIdentifier) {
+        return;
+    }
+    NSMutableArray *reuseArray = self.reuseCells[cell.reuseIdentifier];
+    if (!reuseArray) {
+        reuseArray = [NSMutableArray array];
+        self.reuseCells[cell.reuseIdentifier] = reuseArray;
+    }
+    if ([reuseArray containsObject:cell]) {
+        return;
+    }
+    [reuseArray addObject:cell];
+}
+
+/**
+ *  根据identifier取缓存内的cell
+ *
+ *  @param identifier 标识
+ *
+ *  @return AnyTableViewCell
+ */
 - (AnyTableViewCell *)dequeueReusableCellWithIdentifier:(NSString *)identifier {
-    for (AnyTableViewCell *cell in self.reuseCells) {
-        if ([cell.reuseIdentifier isEqualToString:identifier] && ![self.visibleCells containsObject:cell]) {
+    if (!identifier) {
+        return nil;
+    }
+    NSArray *reuseArray = self.reuseCells[identifier];
+    for (AnyTableViewCell *cell in reuseArray) {
+        if (![self.visibleCells containsObject:cell]) {
             NSLog(@"Shooted! %@", identifier);
             return cell;
         }
     }
     return nil;
-}
-
-//! 两线段是否相交
-- (BOOL)isIntersectWithLine:(CGPoint)line otherLine:(CGPoint)otherLine {
-    return
-    ((line.x - otherLine.x) > Interval && (otherLine.y - line.x) > Interval) ||
-    ((line.y - otherLine.x) > Interval && (otherLine.y - line.y) > Interval) ||
-    ((line.x - otherLine.x) < Interval && (line.y - otherLine.y) > Interval);
 }
 
 @end
